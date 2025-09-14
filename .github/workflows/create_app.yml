@@ -23,15 +23,16 @@ jobs:
         run: |
           echo "WORKFLOW_VERSION=v1" >> $GITHUB_ENV
           echo "INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
+          echo "INPUT_PROJECT_TYPE=${{ github.event.inputs.project_type }}" >> $GITHUB_ENV
           
           PROJECT_TYPE="frontend"
 
-          if [[ "$INPUT_PROJECT_NAME" == *Python ]]; then
+          if [[ "$INPUT_PROJECT_TYPE" == *Python ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Python"
             PROJECT_TYPE="backend"
-          elif [[ "$INPUT_PROJECT_NAME" == *Angular\ Shell ]]; then
+          elif [[ "$INPUT_PROJECT_TYPE" == *Angular\ Shell ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-Shell"
-          elif [[ "$INPUT_PROJECT_NAME" == *Angular\ MFE ]]; then
+          elif [[ "$INPUT_PROJECT_TYPE" == *Angular\ MFE ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-MFE"
           else
             echo "Tipo de aplicação inválido: ${{ env.PROJECT_TYPE }}"
@@ -51,7 +52,7 @@ jobs:
             -H "Authorization: token ${{ secrets.TEMPLATE_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/user/repos \
-            -d "{\"name\":\"$REPO_NAME\", \"private\":false}"
+            -d "{\"name\":\"$PROJECT_NAME\", \"private\":false}"
 
       - name: Clonar template correspondente
         run: |
