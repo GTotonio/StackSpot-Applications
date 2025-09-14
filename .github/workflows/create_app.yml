@@ -25,6 +25,7 @@ jobs:
           INPUT_PROJECT_NAME="${{ github.event.inputs.project_name }}"
           INPUT_PROJECT_TYPE="${{ github.event.inputs.project_type }}"
 
+          echo "Nome do repositório: $INPUT_PROJECT_NAME"
           echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
           
           PROJECT_TYPE="frontend"
@@ -37,7 +38,7 @@ jobs:
           elif [[ $INPUT_PROJECT_TYPE == *Angular\ MFE ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-MFE"
           else
-            echo "Tipo de aplicação inválido: $INPUT_PROJECT_TYPE"
+            echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
             exit 1
           fi
 
@@ -51,7 +52,7 @@ jobs:
       - name: Criar repositório via API
         run: |
 
-          echo "NOME DO REPO: $PROJECT_NAME"
+          echo "Nome do repositório gerado: $PROJECT_NAME"
 
           curl -X POST \
             -H "Authorization: token ${{ secrets.TEMPLATE_TOKEN }}" \
@@ -62,8 +63,10 @@ jobs:
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template: $PROJECT_TEMPLATE para o repositório $PROJECT_NAME..."
-          git clone https://$TEMPLATE_TOKEN@github.com/$PROJECT_TEMPLATE.git temp
+          echo "Clonando template $PROJECT_TEMPLATE para o repositório $PROJECT_NAME..."
+          git clone https://$TEMPLATE_TOKEN@github.com/GTotonio/$PROJECT_TEMPLATE.git temp
+
+          echo "Repositório criado com sucesso."
           
           cd temp
           git remote remove origin
