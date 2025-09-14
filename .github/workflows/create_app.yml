@@ -6,7 +6,7 @@ on:
       project_name:
         description: 'Nome do novo projeto'
         required: true
-      type:
+      project_type:
         description: 'Tipo de aplicação'
         required: true
         type: choice
@@ -21,28 +21,31 @@ jobs:
     steps:
       - name: Definir variáveis
         run: |
-          echo "PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
-          echo "TYPE=${{ github.event.inputs.type }}" >> $GITHUB_ENV
-          WORKFLOW_VERSION="v1"
-
-      - name: Criar repositório via API
-        run: |
-          REPO_TYPE="frontend"
+          echo "WORKFLOW_VERSION=v1" >> $GITHUB_ENV
+          echo "INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
           
-          if [[ "${{ env.TYPE }}" == *Python ]]; then
-            TEMPLATE_REPO="StackSpot-Application-Python"
-            REPO_TYPE="backend"
-          elif [[ "${{ env.TYPE }}" == *Angular\ Shell ]]; then
-            TEMPLATE_REPO="StackSpot-Application-Angular-Shell"
-          elif [[ "${{ env.TYPE }}" == *Angular\ MFE ]]; then
-            TEMPLATE_REPO="StackSpot-Application-Angular-MFE"
+          PROJECT_TYPE="frontend"
+
+          if [[ "$INPUT_PROJECT_NAME" == *Python ]]; then
+            PROJECT_TEMPLATE="StackSpot-Application-Python"
+            PROJECT_TYPE="backend"
+          elif [[ "$INPUT_PROJECT_NAME" == *Angular\ Shell ]]; then
+            PROJECT_TEMPLATE="StackSpot-Application-Angular-Shell"
+          elif [[ "$INPUT_PROJECT_NAME" == *Angular\ MFE ]]; then
+            PROJECT_TEMPLATE="StackSpot-Application-Angular-MFE"
           else
-            echo "Tipo de aplicação inválido: ${{ env.TYPE }}"
+            echo "Tipo de aplicação inválido: ${{ env.PROJECT_TYPE }}"
             exit 1
           fi
 
-          REPO_NAME="gen-$WORKFLOW_VERSION-$REPO_TYPE-$PROJECT_NAME"
-          echo "NOME DO RE: $REPO_NAME"
+          echo "PROJECT_TEMPLATE=$PROJECT_TEMPLATE" >> $GITHUB_ENV
+          echo "PROJECT_TYPE=v$PROJECT_TYPE" >> $GITHUB_ENV
+          echo "PROJECT_NAME=gen-$WORKFLOW_VERSION-$REPO_TYPE-$INPUT_PROJECT_NAME" >> $GITHUB_ENV
+
+      - name: Criar repositório via API
+        run: |
+
+          echo "NOME DO REPO: $PROJECT_NAME"
 
           curl -X POST \
             -H "Authorization: token ${{ secrets.TEMPLATE_TOKEN }}" \
@@ -53,10 +56,10 @@ jobs:
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template: $TEMPLATE_REPO para o repositório $REPO_NAME..."
-          git clone https://$TEMPLATE_TOKEN@github.com/$TEMPLATE_REPO.git temp
+          echo "Clonando template: $PROJECT_TEMPLATE para o repositório $PROJECT_NAME..."
+          git clone https://$TEMPLATE_TOKEN@github.com/$PROJECT_TEMPLATE.git temp
           
           cd temp
           git remote remove origin
-          git remote add origin https://github.com/GTotonio/$REPO_NAME.git
+          git remote add origin https://github.com/GTotonio/$PROJECT_NAME.git
           git push -u origin main
