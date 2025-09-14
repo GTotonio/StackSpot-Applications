@@ -21,9 +21,9 @@ jobs:
     steps:
       - name: Definir variáveis
         run: |
-          echo "WORKFLOW_VERSION=v1" >> $GITHUB_ENV
-          echo "INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
-          echo "INPUT_PROJECT_TYPE=${{ github.event.inputs.project_type }}" >> $GITHUB_ENV
+          WORKFLOW_VERSION=v1
+          INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}
+          INPUT_PROJECT_TYPE=${{ github.event.inputs.project_type }}
 
           echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
           
@@ -41,8 +41,11 @@ jobs:
             exit 1
           fi
 
+          echo "WORKFLOW_VERSION=$WORKFLOW_VERSION" >> $GITHUB_ENV
+          echo "INPUT_PROJECT_NAME=$INPUT_PROJECT_NAME" >> $GITHUB_ENV
+          echo "INPUT_PROJECT_TYPE=$INPUT_PROJECT_TYPE" >> $GITHUB_ENV
           echo "PROJECT_TEMPLATE=$PROJECT_TEMPLATE" >> $GITHUB_ENV
-          echo "PROJECT_TYPE=v$PROJECT_TYPE" >> $GITHUB_ENV
+          echo "PROJECT_TYPE=$PROJECT_TYPE" >> $GITHUB_ENV
           echo "PROJECT_NAME=gen-$WORKFLOW_VERSION-$REPO_TYPE-$INPUT_PROJECT_NAME" >> $GITHUB_ENV
 
       - name: Criar repositório via API
