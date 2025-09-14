@@ -1,0 +1,58 @@
+name: S3 Publish with Versioning
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - uses: actions/checkout@v3
+
+      # 2. Configuração do Node.js
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 3. Cache de dependências do npm
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # 4. Instalação das dependências
+      - run: npm ci
+
+      # 5. Build do projeto
+      - run: npm run build
+
+      # 6. Configuração das credenciais AWS
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: sa-east-1
+
+      # 7. Definindo versão da build (commit SHA curto + timestamp)
+      - name: Set build version
+        id: vars
+        run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          echo "BUILD_VERSION=$SHORT_SHA-$TIMESTAMP" >> $GITHUB_ENV
+
+      # 8. Upload para S3 com versionamento
+      - name: Upload build to S3
+        run: |
+          S3_PATH="s3://teste-s3/${BUILD_VERSION}/"
+          echo "Uploading to $S3_PATH"
+          aws s3 sync dist/ $S3_PATH --acl public-read
+          
+      # 9. Atualizando 'latest' no S3 (opcional)
+      - name: Update latest build
+        run: |
+          aws s3 sync dist/ s3://teste-s3/latest/ --acl public-read --delete
