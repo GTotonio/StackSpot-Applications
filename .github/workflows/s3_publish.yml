@@ -25,7 +25,7 @@ jobs:
             ${{ runner.os }}-node-
 
       # 4. Instalação das dependências
-      - run: npm ci
+      - run: npm i
 
       # 5. Build do projeto
       - run: npm run build
