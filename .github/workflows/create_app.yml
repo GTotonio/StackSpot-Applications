@@ -68,7 +68,7 @@ jobs:
           echo "Clonando template $PROJECT_TEMPLATE para o novo repositório $PROJECT_NAME..."
           echo "token: ${{ secrets.TEMPLATE_TOKEN }}"
           
-          git clone "https://x-access-token:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git" temp
+          git clone "https://gtotonio:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git" temp
 
           echo "Clone efetuado. Criando arquivos iniciais..."
           
