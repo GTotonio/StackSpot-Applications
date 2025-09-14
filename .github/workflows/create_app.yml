@@ -53,7 +53,7 @@ jobs:
           echo "Clonando template: $TEMPLATE_REPO para o repositório $REPO_NAME"
           
           # Clona template em pasta temporária
-          git clone https://github.com/$TEMPLATE_REPO.git temp
+          git clone https://$TEMPLATE_TOKEN@github.com/$TEMPLATE_REPO.git temp
           
           cd temp
           
