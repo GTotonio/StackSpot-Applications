@@ -24,6 +24,11 @@ jobs:
           echo "WORKFLOW_VERSION=v1" >> $GITHUB_ENV
           echo "INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
           echo "INPUT_PROJECT_TYPE=${{ github.event.inputs.project_type }}" >> $GITHUB_ENV
+
+          echo "Nome da aplicação: $INPUT_PROJECT_NAME"
+          echo "Nome da aplicação env: ${{ env.$INPUT_PROJECT_NAME }}"
+
+          echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
           
           PROJECT_TYPE="frontend"
 
