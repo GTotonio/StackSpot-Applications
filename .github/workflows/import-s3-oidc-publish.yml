@@ -24,7 +24,7 @@ jobs:
           INPUT_PROJECT_TYPE="${{ inputs.project-type }}"
           INPUT_PROJECT_NAME="${{ inputs.project-name }}"
           VALID_PROJECT_TYPES=("shell" "mfe")
-          if !printf '%s\n' "${VALID_PROJECT_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
+          if ! printf '%s\n' "${VALID_PROJECT_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
             echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
             exit 1;
           fi
