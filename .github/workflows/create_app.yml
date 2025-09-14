@@ -32,9 +32,9 @@ jobs:
           if [[ "${{ env.TYPE }}" == *Python ]]; then
             TEMPLATE_REPO="StackSpot-Application-Python"
             REPO_TYPE="backend"
-          elif [[ "${{ env.TYPE }}" == *Angular Shell ]]; then
+          elif [[ "${{ env.TYPE }}" == *Angular\ Shell ]]; then
             TEMPLATE_REPO="StackSpot-Application-Angular-Shell"
-          elif [[ "${{ env.TYPE }}" == *Angular MFE ]]; then
+          elif [[ "${{ env.TYPE }}" == *Angular\ MFE ]]; then
             TEMPLATE_REPO="StackSpot-Application-Angular-MFE"
           else
             echo "Tipo de aplicação inválido: ${{ env.TYPE }}"
