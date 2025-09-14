@@ -29,15 +29,15 @@ jobs:
           
           PROJECT_TYPE="frontend"
 
-          if [[ "$INPUT_PROJECT_TYPE" == *Python ]]; then
+          if [[ $INPUT_PROJECT_TYPE == *Python ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Python"
             PROJECT_TYPE="backend"
-          elif [[ "$INPUT_PROJECT_TYPE" == *Angular\ Shell ]]; then
+          elif [[ $INPUT_PROJECT_TYPE == *Angular\ Shell ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-Shell"
-          elif [[ "$INPUT_PROJECT_TYPE" == *Angular\ MFE ]]; then
+          elif [[ $INPUT_PROJECT_TYPE == *Angular\ MFE ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-MFE"
           else
-            echo "Tipo de aplicação inválido: ${{ env.PROJECT_TYPE }}"
+            echo "Tipo de aplicação inválido: $INPUT_PROJECT_TYPE"
             exit 1
           fi
 
