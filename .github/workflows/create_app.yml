@@ -37,12 +37,12 @@ jobs:
           REPO_TYPE="backend"
           
           if [[ "${{ env.TYPE }}" == *Python ]]; then
-            TEMPLATE_REPO="GTotonio/StackSpot-Application-Python"
+            TEMPLATE_REPO="StackSpot-Application-Python"
           elif [[ "${{ env.TYPE }}" == *Angular Shell ]]; then
-            TEMPLATE_REPO="GTotonio/StackSpot-Application-Angular-Shell"
+            TEMPLATE_REPO="StackSpot-Application-Angular-Shell"
             REPO_TYPE="frontend"
           elif [[ "${{ env.TYPE }}" == *Angular MFE ]]; then
-            TEMPLATE_REPO="GTotonio/StackSpot-Application-Angular-MFE"
+            TEMPLATE_REPO="StackSpot-Application-Angular-MFE"
             REPO_TYPE="frontend"
           else
             echo "Tipo de aplicação inválido: ${{ env.TYPE }}"
