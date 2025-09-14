@@ -1,4 +1,4 @@
-name: Create Application
+name: Run - Criar Aplicação
 
 on:
   workflow_dispatch:
