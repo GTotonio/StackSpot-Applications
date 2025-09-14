@@ -7,16 +7,26 @@ on:
         required: false
         type: string
         default: "20"
-      branch:
-        required: false
+      project-type:
+        required: true
         type: string
-        default: "main"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Verifica tipo de aplicação
+        run: |
+          INPUT_PROJECT_TYPE="${{ inputs.project_type }}"
+          VALID_TYPES=("shell" "mfe")
+          if !printf '%s\n' "${VALID_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
+            echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
+            exit 1;
+          fi
+
+          echo "INPUT_PROJECT_TYPE=$INPUT_PROJECT_TYPE" >> $GITHUB_ENV
+
       # 1. Checkout
       - uses: actions/checkout@v3
 
@@ -54,10 +64,10 @@ jobs:
       # 7. Upload para S3
       - name: Upload build
         run: |
-          S3_PATH="s3://gtotonio-webview/${BUILD_VERSION}/"
+          S3_PATH="s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/${BUILD_VERSION}/"
           aws s3 sync dist/ $S3_PATH
 
       # 8. Atualiza latest
       - name: Update latest
         run: |
-          aws s3 sync dist/ s3://gtotonio-webview/latest/ --delete
+          aws s3 sync dist/ s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/latest/ --delete
