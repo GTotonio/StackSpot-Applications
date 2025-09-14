@@ -22,8 +22,8 @@ jobs:
       - name: Definir variáveis
         run: |
           WORKFLOW_VERSION=v1
-          INPUT_PROJECT_NAME=${{ github.event.inputs.project_name }}
-          INPUT_PROJECT_TYPE=${{ github.event.inputs.project_type }}
+          INPUT_PROJECT_NAME="${{ github.event.inputs.project_name }}"
+          INPUT_PROJECT_TYPE="${{ github.event.inputs.project_type }}"
 
           echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
           
