@@ -1,4 +1,4 @@
-name: Deploy para Bucket S3
+name: S3 Publish with OIDC
 
 on:
   workflow_call:
@@ -10,21 +10,25 @@ on:
         required: false
         type: string
         default: "20"
+      branch:
+        required: false
+        type: string
+        default: "main"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do código
+      # 1. Checkout
       - uses: actions/checkout@v3
 
-      # 2. Configuração do Node.js
+      # 2. Setup Node.js
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node-version }}
 
-      # 3. Cache de dependências do npm
+      # 3. Cache npm
       - uses: actions/cache@v3
         with:
           path: ~/.npm
@@ -32,20 +36,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # 4. Instalação das dependências
+      # 4. Install dependencies and build
       - run: npm ci
-
-      # 5. Build do projeto
       - run: npm run build
 
-      # 6. Configuração das credenciais AWS
+      # 5. Configure AWS CLI via OIDC
       - uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::522605700248:role/GitHub-S3-Role
           aws-region: sa-east-1
 
-      # 7. Definindo versão da build (commit SHA curto + timestamp)
+      # 6. Versioning
       - name: Set build version
         id: vars
         run: |
@@ -53,14 +54,13 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           echo "BUILD_VERSION=$SHORT_SHA-$TIMESTAMP" >> $GITHUB_ENV
 
-      # 8. Upload para S3 com versionamento
-      - name: Upload build to S3
+      # 7. Upload para S3
+      - name: Upload build
         run: |
           S3_PATH="s3://${{ inputs.s3-bucket }}/${BUILD_VERSION}/"
-          echo "Efetuando publicação do projeto ao path $S3_PATH"
           aws s3 sync dist/ $S3_PATH --acl public-read
-          
-      # 9. Atualizando 'latest' no S3 (opcional)
-      - name: Update latest build
+
+      # 8. Atualiza latest
+      - name: Update latest
         run: |
           aws s3 sync dist/ s3://${{ inputs.s3-bucket }}/latest/ --acl public-read --delete
