@@ -41,7 +41,7 @@ jobs:
       - run: npm run build
 
       # 5. Configure AWS CLI via OIDC
-      - uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::522605700248:role/GitHub-S3-Role
           aws-region: sa-east-1
