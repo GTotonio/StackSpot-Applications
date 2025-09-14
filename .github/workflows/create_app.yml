@@ -67,14 +67,16 @@ jobs:
 
           echo "Clonando template $PROJECT_TEMPLATE para o novo repositório $PROJECT_NAME..."
           echo "token: ${{ secrets.TEMPLATE_TOKEN }}"
+
+          USER=GTotonio
           
-          git clone "https://gtotonio:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git" temp
+          git clone "https://$USER:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git" temp
 
           echo "Clone efetuado. Criando arquivos iniciais..."
           
           cd temp
           git remote remove origin
-          git remote add origin https://github.com/GTotonio/$PROJECT_NAME.git
+          git remote add origin https://$USER:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_NAME.git
           git push -u origin main
 
-          echo "Repositório criado com sucesso: https://github.com/GTotonio/$PROJECT_NAME.git"
+          echo "Repositório criado com sucesso: https://github.com/$USER/$PROJECT_NAME.git"
