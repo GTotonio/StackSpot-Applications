@@ -1,7 +1,15 @@
-name: S3 Publish with Versioning
+name: Deploy para Bucket S3
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      s3-bucket:
+        required: true
+        type: string
+      node-version:
+        required: false
+        type: string
+        default: "20"
 
 jobs:
   build:
@@ -14,7 +22,7 @@ jobs:
       # 2. Configuração do Node.js
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: ${{ inputs.node-version }}
 
       # 3. Cache de dependências do npm
       - uses: actions/cache@v3
@@ -25,7 +33,7 @@ jobs:
             ${{ runner.os }}-node-
 
       # 4. Instalação das dependências
-      - run: npm i
+      - run: npm ci
 
       # 5. Build do projeto
       - run: npm run build
@@ -48,11 +56,11 @@ jobs:
       # 8. Upload para S3 com versionamento
       - name: Upload build to S3
         run: |
-          S3_PATH="s3://teste-s3/${BUILD_VERSION}/"
-          echo "Uploading to $S3_PATH"
+          S3_PATH="s3://${{ inputs.s3-bucket }}/${BUILD_VERSION}/"
+          echo "Efetuando publicação do projeto ao path $S3_PATH"
           aws s3 sync dist/ $S3_PATH --acl public-read
           
       # 9. Atualizando 'latest' no S3 (opcional)
       - name: Update latest build
         run: |
-          aws s3 sync dist/ s3://teste-s3/latest/ --acl public-read --delete
+          aws s3 sync dist/ s3://${{ inputs.s3-bucket }}/latest/ --acl public-read --delete
