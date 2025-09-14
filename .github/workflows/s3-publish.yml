@@ -3,9 +3,6 @@ name: S3 Publish with OIDC
 on:
   workflow_call:
     inputs:
-      s3-bucket:
-        required: true
-        type: string
       node-version:
         required: false
         type: string
@@ -57,10 +54,10 @@ jobs:
       # 7. Upload para S3
       - name: Upload build
         run: |
-          S3_PATH="s3://${{ inputs.s3-bucket }}/${BUILD_VERSION}/"
+          S3_PATH="s3://gtotonio-webview/${BUILD_VERSION}/"
           aws s3 sync dist/ $S3_PATH --acl public-read
 
       # 8. Atualiza latest
       - name: Update latest
         run: |
-          aws s3 sync dist/ s3://${{ inputs.s3-bucket }}/latest/ --acl public-read --delete
+          aws s3 sync dist/ s3://gtotonio-webview/latest/ --acl public-read --delete
