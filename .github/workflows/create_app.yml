@@ -47,7 +47,7 @@ jobs:
           echo "INPUT_PROJECT_TYPE=$INPUT_PROJECT_TYPE" >> $GITHUB_ENV
           echo "PROJECT_TEMPLATE=$PROJECT_TEMPLATE" >> $GITHUB_ENV
           echo "PROJECT_TYPE=$PROJECT_TYPE" >> $GITHUB_ENV
-          echo "PROJECT_NAME=gen-$WORKFLOW_VERSION-$REPO_TYPE-$INPUT_PROJECT_NAME" >> $GITHUB_ENV
+          echo "PROJECT_NAME=gen-$WORKFLOW_VERSION-$PROJECT_TYPE-$INPUT_PROJECT_NAME" >> $GITHUB_ENV
 
       - name: Criar repositório via API
         run: |
@@ -60,15 +60,21 @@ jobs:
             https://api.github.com/user/repos \
             -d "{\"name\":\"$PROJECT_NAME\", \"private\":false}"
 
+          echo "Repositório criado com sucesso."
+
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template $PROJECT_TEMPLATE para o repositório $PROJECT_NAME..."
-          git clone https://${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git temp
+          echo "Clonando template $PROJECT_TEMPLATE para o novo repositório $PROJECT_NAME..."
+          echo "token: ${{ secrets.TEMPLATE_TOKEN }}"
+          
+          git clone https://x-access-token:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git temp
 
-          echo "Repositório criado com sucesso."
+          echo "Clone efetuado. Criando arquivos iniciais..."
           
           cd temp
           git remote remove origin
           git remote add origin https://github.com/GTotonio/$PROJECT_NAME.git
           git push -u origin main
+
+          echo "Repositório criado com sucesso: https://github.com/GTotonio/$PROJECT_NAME.git"
