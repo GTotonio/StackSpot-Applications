@@ -1,0 +1,65 @@
+name: Create Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: 'Nome do novo projeto'
+        required: true
+      type:
+        description: 'Tipo de aplicação'
+        required: true
+        type: choice
+        options:
+          - Backend - Python
+          - Frontend - Angular Shell
+          - Frontend - Angular MFE
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Definir variáveis
+        run: |
+          echo "PROJECT_NAME=${{ github.event.inputs.project_name }}" >> $GITHUB_ENV
+          echo "TYPE=${{ github.event.inputs.type }}" >> $GITHUB_ENV
+          WORKFLOW_VERSION="v1"
+
+      - name: Criar repositório vazio
+        uses: peter-evans/create-or-update-repo@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.PROJECT_NAME }}
+          private: false
+
+      - name: Clonar template correspondente
+        run: |
+          REPO_TYPE="backend"
+          
+          if [[ "${{ env.TYPE }}" == *Python ]]; then
+            TEMPLATE_REPO="GTotonio/StackSpot-Application-Python"
+          elif [[ "${{ env.TYPE }}" == *Angular Shell ]]; then
+            TEMPLATE_REPO="GTotonio/StackSpot-Application-Angular-Shell"
+            REPO_TYPE="frontend"
+          elif [[ "${{ env.TYPE }}" == *Angular MFE ]]; then
+            TEMPLATE_REPO="GTotonio/StackSpot-Application-Angular-MFE"
+            REPO_TYPE="frontend"
+          else
+            echo "Tipo de aplicação inválido: ${{ env.TYPE }}"
+            exit 1
+          fi
+
+          REPO_NAME="gen-${WORKFLOW_VERSION}-${REPO_TYPE}-${{ env.PROJECT_NAME }}"
+          echo "Clonando template: $TEMPLATE_REPO para o repositório $REPO_NAME"
+          
+          # Clona template em pasta temporária
+          git clone https://github.com/$TEMPLATE_REPO.git temp
+          
+          cd temp
+          
+          # Remove o remote original e adiciona o do novo repositório
+          git remote remove origin
+          git remote add origin https://github.com/GTotonio/$REPO_NAME.git
+          
+          # Push para o novo repositório
+          git push -u origin main
