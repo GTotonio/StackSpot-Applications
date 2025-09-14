@@ -1,4 +1,4 @@
-name: S3 Publish with OIDC
+name: Import - Publicar em Bucket S3 via OIDC
 
 on:
   workflow_call:
