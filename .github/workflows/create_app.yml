@@ -52,8 +52,8 @@ jobs:
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template: $TEMPLATE_REPO para o repositório $REPO_NAME..."
-          git clone https://$TEMPLATE_TOKEN@github.com/$TEMPLATE_REPO.git temp
+          echo "Clonando template: ${TEMPLATE_REPO} para o repositório ${REPO_NAME}..."
+          git clone https://${TEMPLATE_TOKEN}@github.com/${TEMPLATE_REPO}.git temp
           
           cd temp
           git remote remove origin
