@@ -23,6 +23,7 @@ jobs:
         run: |
           INPUT_PROJECT_TYPE="${{ inputs.project-type }}"
           INPUT_PROJECT_NAME="${{ inputs.project-name }}"
+          PROJECT_NAME="${INPUT_PROJECT_NAME##*/}"
           VALID_PROJECT_TYPES=("shell" "mfe")
           if ! printf '%s\n' "${VALID_PROJECT_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
             echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
@@ -30,7 +31,7 @@ jobs:
           fi
 
           echo "INPUT_PROJECT_TYPE=$INPUT_PROJECT_TYPE" >> $GITHUB_ENV
-          echo "INPUT_PROJECT_NAME=$INPUT_PROJECT_NAME" >> $GITHUB_ENV
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
 
       # 1. Checkout
       - uses: actions/checkout@v3
@@ -69,10 +70,10 @@ jobs:
       # 7. Upload para S3
       - name: Upload build
         run: |
-          S3_PATH="s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/${INPUT_PROJECT_NAME}/${BUILD_VERSION}/"
+          S3_PATH="s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/${PROJECT_NAME}/${BUILD_VERSION}/"
           aws s3 sync dist/ $S3_PATH
 
       # 8. Atualiza latest
       - name: Update latest
         run: |
-          aws s3 sync dist/ s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/${INPUT_PROJECT_NAME}/latest/ --delete
+          aws s3 sync dist/ s3://gtotonio-webview/${INPUT_PROJECT_TYPE}/${PROJECT_NAME}/latest/ --delete
