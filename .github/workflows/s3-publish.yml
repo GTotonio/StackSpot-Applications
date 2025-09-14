@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-node-
 
       # 4. Install dependencies and build
-      - run: npm ci
+      - run: npm i
       - run: npm run build
 
       # 5. Configure AWS CLI via OIDC
