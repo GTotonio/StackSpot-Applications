@@ -18,9 +18,9 @@ jobs:
     steps:
       - name: Verifica tipo de aplicação
         run: |
-          INPUT_PROJECT_TYPE="${{ inputs.project_type }}"
-          VALID_TYPES=("shell" "mfe")
-          if !printf '%s\n' "${VALID_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
+          INPUT_PROJECT_TYPE="${{ inputs.project-type }}"
+          VALID_PROJECT_TYPES=("shell" "mfe")
+          if !printf '%s\n' "${VALID_PROJECT_TYPES[@]}" | grep -qx "$INPUT_PROJECT_TYPE"; then
             echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
             exit 1;
           fi
