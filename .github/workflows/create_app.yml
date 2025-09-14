@@ -41,7 +41,7 @@ jobs:
             exit 1
           fi
 
-          REPO_NAME="gen-${WORKFLOW_VERSION}-${REPO_TYPE}-${{ env.PROJECT_NAME }}"
+          REPO_NAME="gen-${{ WORKFLOW_VERSION }}-${{ REPO_TYPE }}-${{ env.PROJECT_NAME }}"
 
           curl -X POST \
             -H "Authorization: token ${{ secrets.TEMPLATE_TOKEN }}" \
@@ -52,10 +52,10 @@ jobs:
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template: ${TEMPLATE_REPO} para o repositório ${REPO_NAME}..."
-          git clone https://${TEMPLATE_TOKEN}@github.com/${TEMPLATE_REPO}.git temp
+          echo "Clonando template: ${{ TEMPLATE_REPO }} para o repositório ${{ REPO_NAME }}..."
+          git clone https://${{ TEMPLATE_TOKEN }}@github.com/${{ TEMPLATE_REPO }}.git temp
           
           cd temp
           git remote remove origin
-          git remote add origin https://github.com/GTotonio/$REPO_NAME.git
+          git remote add origin https://github.com/GTotonio/${{ REPO_NAME }}.git
           git push -u origin main
