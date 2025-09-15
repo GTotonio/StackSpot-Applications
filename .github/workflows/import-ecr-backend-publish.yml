@@ -7,23 +7,50 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Definição do nome da imagem a ser utilizada
+      - name: Set Docker image name
+        run: |
+          INPUT_PROJECT_NAME="${{ inputs.project-name }}"
+          PROJECT_NAME="${INPUT_PROJECT_NAME##*/}"
+
+          echo "ℹ️ - Nome da imagem Docker: $PROJECT_NAME"
+
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+
+      # 2. Checkout para a branch do repositório
       - uses: actions/checkout@v3
 
-      # 1. Configura Docker (pré-requisito para usar Docker no GitHub Actions)
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # 2. Build da imagem Docker
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: myapp:latest
-
-      # 3. Configure AWS CLI via OIDC
+      # 3. Configura a AWS CLI via OIDC
       - uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::522605700248:role/GitHub-S3-Role
           aws-region: sa-east-1
+
+      # 4. Cria repositório ECR dinamicamente se não existir
+      - name: Create ECR repository if not exists
+        run: |
+          aws ecr describe-repositories --repository-names "$PROJECT_NAME" || \
+          aws ecr create-repository --repository-name "$PROJECT_NAME"
+
+      # 5. Login no ECR
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          region: sa-east-1
+
+      # 6. Build da imagem Docker
+      - name: Build Docker image
+        id: build-image
+        run: |
+          IMAGE_TAG=latest
+          ECR_REGISTRY=522605700248.dkr.ecr.sa-east-1.amazonaws.com
+          FULL_PROJECT_NAME=$ECR_REGISTRY/$PROJECT_NAME:$IMAGE_TAG
+
+          docker build -t $FULL_PROJECT_NAME .
+
+          echo "FULL_PROJECT_NAME=$FULL_PROJECT_NAME" >> $GITHUB_ENV
+
+      # 7. Push da imagem para o ECR
+      - name: Push Docker image to ECR
+        run: |
+          docker push $FULL_PROJECT_NAME
