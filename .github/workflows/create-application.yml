@@ -25,6 +25,8 @@ jobs:
           INPUT_PROJECT_NAME="${{ github.event.inputs.project_name }}"
           INPUT_PROJECT_TYPE="${{ github.event.inputs.project_type }}"
 
+          echo "GITHUB_REF: $GITHUB_REF"
+          exit 1
           echo "Nome do repositório: $INPUT_PROJECT_NAME"
           echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
           
