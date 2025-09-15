@@ -21,17 +21,20 @@ jobs:
     steps:
       - name: Definir variáveis
         run: |
-          WORKFLOW_VERSION=v1
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            WORKFLOW_VERSION=${GITHUB_REF#refs/tags/}
+          else
+            echo "❌ - A criação da aplicação só pode ser inciada à partir de uma tag."
+            exit 1
+          fi
           INPUT_PROJECT_NAME="${{ github.event.inputs.project_name }}"
           INPUT_PROJECT_TYPE="${{ github.event.inputs.project_type }}"
 
-          echo "GITHUB_REF: $GITHUB_REF"
-          exit 1
-          echo "Nome do repositório: $INPUT_PROJECT_NAME"
-          echo "Tipo do repositório: $INPUT_PROJECT_TYPE"
+          echo "ℹ️ - Versão do workflow: $WORKFLOW_VERSION"
+          echo "ℹ️ - Nome do repositório: $INPUT_PROJECT_NAME"
+          echo "ℹ️ - Tipo do repositório: $INPUT_PROJECT_TYPE"
           
           PROJECT_TYPE="frontend"
-
           if [[ $INPUT_PROJECT_TYPE == *Python ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Python"
             PROJECT_TYPE="backend"
@@ -40,7 +43,7 @@ jobs:
           elif [[ $INPUT_PROJECT_TYPE == *Angular\ MFE ]]; then
             PROJECT_TEMPLATE="StackSpot-Application-Angular-MFE"
           else
-            echo "Tipo do repositório inválido: $INPUT_PROJECT_TYPE"
+            echo "❌ - O tipo do repositório selecionado é inválido."
             exit 1
           fi
 
@@ -54,7 +57,7 @@ jobs:
       - name: Criar repositório via API
         run: |
 
-          echo "Nome do repositório gerado: $PROJECT_NAME"
+          echo "👍 - Nome do repositório gerado: $PROJECT_NAME"
 
           curl -X POST \
             -H "Authorization: token ${{ secrets.TEMPLATE_TOKEN }}" \
@@ -62,23 +65,23 @@ jobs:
             https://api.github.com/user/repos \
             -d "{\"name\":\"$PROJECT_NAME\", \"private\":false}"
 
-          echo "Repositório criado com sucesso."
+          echo "✅ - Repositório criado com sucesso."
 
       - name: Clonar template correspondente
         run: |
 
-          echo "Clonando template $PROJECT_TEMPLATE para o novo repositório $PROJECT_NAME..."
-          echo "token: ${{ secrets.TEMPLATE_TOKEN }}"
+          echo "⏳ - Clonando template $PROJECT_TEMPLATE para o novo repositório $PROJECT_NAME..."
 
           USER=GTotonio
           
           git clone "https://$USER:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_TEMPLATE.git" temp
 
-          echo "Clone efetuado. Criando arquivos iniciais..."
+          echo "✅ - Clone efetuado."
+          echo "⏳ -Criando arquivos iniciais..."
           
           cd temp
           git remote remove origin
           git remote add origin https://$USER:${{ secrets.TEMPLATE_TOKEN }}@github.com/GTotonio/$PROJECT_NAME.git
           git push -u origin main
 
-          echo "Repositório criado com sucesso: https://github.com/$USER/$PROJECT_NAME.git"
+          echo "✅ - Processo de criação de novo repositório concluído. Link: https://github.com/$USER/$PROJECT_NAME.git"
