@@ -1,0 +1,29 @@
+name: Import - Publicar em Bucket S3 via OIDC
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1. Configura Docker (pré-requisito para usar Docker no GitHub Actions)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 2. Build da imagem Docker
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: myapp:latest
+
+      # 3. Configure AWS CLI via OIDC
+      - uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::522605700248:role/GitHub-S3-Role
+          aws-region: sa-east-1
