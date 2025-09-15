@@ -15,7 +15,7 @@ jobs:
       - name: Set Docker image name
         run: |
           INPUT_PROJECT_NAME="${{ inputs.project-name }}"
-          PROJECT_NAME="${INPUT_PROJECT_NAME##*/}"
+          PROJECT_NAME=$(echo "${INPUT_PROJECT_NAME##*/}" | tr '[:upper:]' '[:lower:]')
 
           echo "ℹ️ - Nome da imagem Docker: $PROJECT_NAME"
 
